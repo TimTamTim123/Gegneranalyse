@@ -1,6 +1,5 @@
 import pandas as pd #pip install pandas openpyxl
 import streamlit as st #pip install streamlit
-import plotly.express as px #pip install plotly-express
 import plotly.graph_objects as go
 import numpy as np
 
