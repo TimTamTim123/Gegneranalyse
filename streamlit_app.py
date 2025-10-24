@@ -19,7 +19,9 @@ with tab1:
                               usecols='A:L', header=0)
         df_24 = pd.read_excel(io='Gegner_DB_24-25.xlsx', sheet_name='Datenbank',
                               usecols='A:L', header=0)
-        df = pd.concat([df_23, df_24], ignore_index=True)
+        df_25 = pd.read_excel(io='Gegner_DB_25-26.xlsx', sheet_name='Datenbank',
+                              usecols='A:L', header=0)
+        df = pd.concat([df_23, df_24, df_25], ignore_index=True)
         df = df.reset_index(drop=True)
         df = df.drop(columns=['KW'])
         df = df[df.iloc[:, 3].notna() & (df.iloc[:, 3] != '')]  # Lösche alle leeren Zeilen
