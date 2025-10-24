@@ -38,7 +38,7 @@ with tab1:
 
     season = st.sidebar.multiselect('Wähle eine Saison:',
                                     options=df['Saison'].unique(),
-                                    default='2024/2025'
+                                    default='2025/2026'
                                     )
     if not season:
         season = df['Saison'].unique()
@@ -278,12 +278,20 @@ with tab2:
     st.header("Berechnungsprogramm 🖥️")
     st.write('In der Filterschablone am besten die aktuelle Saison wählen. '
              'Ist eine Liga im Filter ausgewählt, werden nur die Mannschaften der entsprechenden Liga angezeigt.')
+    options = ["A", "B", "C"]
+    BP_season = st.multiselect(
+        "Wähle die zu einzubeziehenden Saisons:",
+        options=df['Saison'].unique(), default='2025/2026'
+    )
 
     col1, col2= st.columns(2) #Erstelle 2 Spalten
-
+    
     with col1:
         selected_hometeam = st.selectbox("Wähle eine Heimteam", unique_teams)
-        df_selected_hometeam=df[df['Team']==selected_hometeam]
+        df_selected_hometeam = df[
+        (df['Team'] == selected_hometeam) &
+        (df['Saison'].isin(BP_season))
+                                        ]
         df_selected_hometeam=df_selected_hometeam[~df_selected_hometeam['Name'].str.contains('/',na=False)]
         df_selected_hometeam=df_selected_hometeam[df_selected_hometeam['Wo']=='H']
         df_selected_hometeam['Time'] = (df_selected_hometeam['Datum'] - pd.Timestamp("2022-01-01")) // pd.Timedelta('1D')
@@ -316,6 +324,7 @@ with tab2:
                 n, b = np.polyfit(trend_person['Time'].tail(3), trend_person['Ergebnis'].tail(3), 1)
             analysis_hometeam.loc[j, 'Trend 3 Spiele'] = n * 7
         analysis_hometeam = analysis_hometeam.sort_values(by='Spiele', ascending=False)
+        analysis_hometeam['Streuung'] = analysis_hometeam['Streuung'].fillna(0)
         st.write(analysis_hometeam[['Name','Spiele','Schnitt']])
         hometeamplayer1=  st.selectbox("Wähle Heimspieler:in 1",analysis_hometeam['Name'].unique(),index=0)
         hometeamplayer2 = st.selectbox("Wähle Heimspieler:in 2", analysis_hometeam['Name'].unique(),index=1)
@@ -329,7 +338,10 @@ with tab2:
 
     with col2:
         selected_awayteam = st.selectbox("Wähle eine Auswärtsteam", unique_teams)
-        selected_awayteam = df[df['Team'] == selected_awayteam]
+        selected_awayteam = df[
+            (df['Team'] == selected_awayteam) &
+            (df['Saison'].isin(BP_season))
+            ]
         selected_awayteam = selected_awayteam[~selected_awayteam['Name'].str.contains('/', na=False)]
         selected_awayteam = selected_awayteam[selected_awayteam['Wo'] == 'A']
         selected_awayteam['Time'] = (selected_awayteam['Datum'] - pd.Timestamp("2022-01-01")) // pd.Timedelta(
@@ -368,6 +380,8 @@ with tab2:
                 n, b = np.polyfit(trend_person['Time'].tail(3), trend_person['Ergebnis'].tail(3), 1)
             analysis_awayteam.loc[j, 'Trend 3 Spiele'] = n * 7
         analysis_awayteam = analysis_awayteam.sort_values(by='Spiele', ascending=False)
+        analysis_awayteam['Streuung'] = analysis_awayteam['Streuung'].fillna(0)
+
         st.write(analysis_awayteam[['Name','Spiele','Schnitt']])
         awayteamplayer1 = st.selectbox("Wähle Auswärtsspieler:in 1", analysis_awayteam['Name'].unique(), index=0)
         awayteamplayer2 = st.selectbox("Wähle Auswärtsspieler:in 2", analysis_awayteam['Name'].unique(), index=1)
